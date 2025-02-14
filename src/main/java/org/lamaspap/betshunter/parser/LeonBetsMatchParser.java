@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -66,19 +67,10 @@ public class LeonBetsMatchParser implements MatchParserService {
         var reports = Collections.synchronizedList(new ArrayList<Report>());
 
         try (ExecutorService executor = Executors.newFixedThreadPool(3, Thread.ofVirtual().factory())) {
-
-            topLeaguesBySport.forEach((key, value) -> {
-                List<CompletableFuture<Void>> futures = value.stream()
-                        .map(league -> CompletableFuture.runAsync(() -> {
-                            List<Event> leagueEvents = getLeagueEventsLimited(league.id());
-
-                            List<Event> fullEvents = leagueEvents.stream()
-                                    .map(event -> getFullEventData(event.id()))
-                                    .toList();
-
-                            reports.add(reportGenerator.createReport(key, league.name(), fullEvents));
-
-                        }, executor))
+            topLeaguesBySport.forEach((sportName, leagues) -> {
+                List<CompletableFuture<Void>> futures = leagues.stream()
+                        .map(league -> CompletableFuture.runAsync(
+                                () -> processLeague(sportName, league, reports), executor))
                         .toList();
 
                 CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
@@ -86,6 +78,47 @@ public class LeonBetsMatchParser implements MatchParserService {
         }
 
         return reports;
+    }
+
+
+    /**
+     * Processes a specific league by retrieving its events, enriching their data, and generating a report.
+     *
+     * @param sportName the name of the sport the league belongs to
+     * @param league    the league to process
+     * @param reports   the shared list to store the generated report for the league
+     */
+    private void processLeague(String sportName, League league, List<Report> reports) {
+        try {
+            List<Event> fullEvents = getLeagueEventsLimited(league.id()).stream()
+                    .map(leagueEvent -> processEvent(league, leagueEvent))
+                    .filter(Objects::nonNull)
+                    .toList();
+
+            Report report = reportGenerator.createReport(sportName, league.name(), fullEvents);
+            reports.add(report);
+        }
+        catch (Exception e) {
+            LOG.error("Error processing league {}: {}", league.name(), e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Retrieves detailed data for a specific event and returns the enriched {@link Event} object.
+     *
+     * @param league the league the event belongs to
+     * @param event  the event to fetch detailed data for
+     * @return the {@link Event} with full data if successful, or {@code null} if an error occurs
+     */
+    private Event processEvent(League league, Event event) {
+        try {
+            return getFullEventData(event.id());
+        }
+        catch (Exception e) {
+            LOG.error("Error retrieving full data for event with id {} name: {} in league {}",
+                    event.id(), event.name(), league.id(), e);
+            return null;
+        }
     }
 
     /**
