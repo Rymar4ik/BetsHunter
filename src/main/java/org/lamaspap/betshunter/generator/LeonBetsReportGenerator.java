@@ -17,12 +17,12 @@ import java.util.List;
 public class LeonBetsReportGenerator implements ReportGenerator {
 
     @Override
-    public Report createReport(Event fullEventData) {
-        var league = fullEventData.league();
-        var sportName = league.sport().name();
+    public Report createReport(String sportName, String leagueName, List<Event> fullEvents) {
         var leagueSummary = new LeagueSummary(
-                league.name(),
-                List.of(createMatchSummary(fullEventData))
+                leagueName,
+                fullEvents.stream()
+                        .map(this::createMatchSummary)
+                        .toList()
         );
         return new Report(sportName, leagueSummary);
     }

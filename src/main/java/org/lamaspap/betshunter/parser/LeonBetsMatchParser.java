@@ -53,10 +53,11 @@ public class LeonBetsMatchParser implements MatchParserService {
                         .map(league -> CompletableFuture.runAsync(() -> {
                             List<Event> leagueEvents = getLeagueEventsLimited(league.id());
 
-                            leagueEvents.forEach(event -> {
-                                Event fullEventData = getFullEventData(event.id());
-                                reports.add(reportGenerator.createReport(fullEventData));
-                            });
+                            List<Event> fullEvents = leagueEvents.stream()
+                                    .map(event -> getFullEventData(event.id()))
+                                    .toList();
+
+                            reports.add(reportGenerator.createReport(key, league.name(), fullEvents));
 
                         }, executor))
                         .toList();
