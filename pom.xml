@@ -19,6 +19,12 @@
 
     <properties>
         <java.version>21</java.version>
+
+        <jersey.version>3.0.4</jersey.version>
+        <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
+        <retrofit.version>2.9.0</retrofit.version>
+        <jackson.version>2.13.3</jackson.version>
+        <converter.jackson.version>2.11.0</converter.jackson.version>
     </properties>
 
     <dependencies>
@@ -26,36 +32,36 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-common</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
-            <version>3.1.0</version>
+            <version>${jakarta.ws.rs-api.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.squareup.retrofit2</groupId>
             <artifactId>retrofit</artifactId>
-            <version>2.9.0</version>
+            <version>${retrofit.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.13.3</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.13.3</version>
+            <version>${jackson.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.squareup.retrofit2</groupId>
             <artifactId>converter-jackson</artifactId>
-            <version>2.11.0</version>
+            <version>${converter.jackson.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

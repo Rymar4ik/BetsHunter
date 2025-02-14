@@ -23,10 +23,6 @@ public class UnwrapException extends WebApplicationException {
         this.code = code;
     }
 
-    public int getCode() {
-        return code;
-    }
-
     @Override
     public synchronized Throwable fillInStackTrace() {
         if (this.suppressStackTrace) {

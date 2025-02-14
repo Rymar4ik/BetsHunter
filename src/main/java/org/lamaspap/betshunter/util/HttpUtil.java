@@ -24,8 +24,8 @@ public final class HttpUtil {
             }
 
             HttpUrl url = response.raw().request().url();
-            String message = String.format("REST call to %s, failed with code: %d and error: %s", url, response.code(),
-                    response.message());
+            String message = String.format("REST call to %s, failed with code: %d and error: %s. Probably should check your VPN settings!",
+                    url, response.code(), response.message());
 
             throw new UnwrapException(message, response.code());
         }
